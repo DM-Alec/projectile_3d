@@ -1,0 +1,64 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Mar 17 17:53:42 2024
+
+@author: Alec
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+def projectile_dynamics(state, t, m, g, wind):
+    """Compute derivatives for projectile dynamics."""
+    x, y, z, vx, vy, vz = state
+    
+    # Compute drag force
+    v = np.sqrt(vx**2 + vy**2 + vz**2)
+    drag = -0.1 * v * np.array([vx, vy, vz])
+    
+    # Compute total forces
+    gravity = np.array([0, 0, g])
+    total_force = gravity + drag + wind
+    
+    # Compute acceleration
+    ax, ay, az = total_force / m
+    
+    return [vx, vy, vz, ax, ay, az]
+
+def simulate_projectile():
+    """Simulate projectile motion and plot results."""
+    # Define constant parameters
+    M = 650  # Projectile mass (kg)
+    G = -9.81  # Gravitational acceleration (m/s^2)
+    WIND = np.array([0, 0, 0])  # No wind for simplicity
+    
+    # Initial conditions
+    x0, y0, z0 = 0, 0, 0  # Initial position (m)
+    vx0, vy0, vz0 = 100, 100, 100  # Initial velocity (m/s)
+    state_initial = np.array([x0, y0, z0, vx0, vy0, vz0])
+    
+    # Time window
+    t_out = np.linspace(0, 30, 1000)  # Time vector (sec)
+    
+    # Numerical integration
+    state_out = sci.odeint(projectile_dynamics, state_initial, t_out, args=(M, G, WIND))
+    
+    # Extract variables
+    x_out, y_out, z_out = state_out[:, 0], state_out[:, 1], state_out[:, 2]
+    
+    # Plot trajectory in 3D
+    fig = plt.figure(figsize=(10, 7))
+    ax = fig.add_subplot(111, projection='3d')
+    
+    ax.plot(x_out, y_out, z_out)
+    
+    ax.set_xlabel('X (m)')
+    ax.set_ylabel('Y (m)')
+    ax.set_zlabel('Z (m)')
+    ax.set_title('Projectile Motion')
+    
+    plt.show()
+
+if __name__ == "__main__":
+    simulate_projectile()
